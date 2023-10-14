@@ -31,13 +31,13 @@ create , compile and fit the dataset
 ### STEP 9:
 Make prediction with sample text
 ## PROGRAM
-~
+```
 Developed by: P SYAM TEJ
 Reg no: 212221240056
-~
+```
 
 ## Importing the required packages
-~
+```
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -45,32 +45,32 @@ from tensorflow.keras.preprocessing import sequence
 from sklearn.model_selection import train_test_split
 from keras import layers
 from keras.models import Model
-~
+```
 ## Importing the dataset
-~
+```
 data = pd.read_csv("ner_dataset.csv", encoding="latin1")
-~
+```
 ## Filling the null values with previous values
-~
+```
 data = data.fillna(method="ffill")
-~
+```
 ## Getting the count of unique words
-~
+```
 print("Unique words in corpus:", data['Word'].nunique())
 print("Unique tags in corpus:", data['Tag'].nunique())
-~
+```
 ## creating the lists 
-~
+```
 words=list(data['Word'].unique())
 words.append("ENDPAD")
 tags=list(data['Tag'].unique())
-~
+```
 ## Printing the unique tags
-~
+```
 print("Unique tags are:", tags)
-~ 
+```
 ## Creating the sentencegetter class
-~
+```
 class SentenceGetter(object):
     def _init_(self, data):
         self.n_sent = 1
@@ -92,39 +92,39 @@ class SentenceGetter(object):
 
 getter = SentenceGetter(data)
 sentences = getter.sentences
-~
+```
 ## Making the index values for words and tags 
-~
+```
 word2idx = {w: i + 1 for i, w in enumerate(words)}
 tag2idx = {t: i for i, t in enumerate(tags)}
-~
+```
 
 ## plotting the history
-~
+```
 plt.hist([len(s) for s in sentences], bins=50)
 plt.show()
-~
+```
 ## Assigning the values 
-~
+```
 X1 = [[word2idx[w[0]] for w in s] for s in sentences]
 y1 = [[tag2idx[w[2]] for w in s] for s in sentences]
 max_len = 50
-~
+```
 ## Assigning the x value
-~
+```
 X = sequence.pad_sequences(maxlen=max_len,
                   sequences=X1, padding="post",
                   value=num_words-1)
-~
+```
 ## Assigning the y value
-~
+```
 y = sequence.pad_sequences(maxlen=max_len,
                   sequences=y1,
                   padding="post",
                   value=tag2idx["O"])
-~
+```
 ## Creating the model
-~
+```
 input_word = layers.Input(shape=(max_len,))
 embedding_layer=layers.Embedding(input_dim=num_words,output_dim=50,input_length=max_len)(input_word)
 dropout_layer=layers.SpatialDropout1D(0.1)(embedding_layer)
@@ -134,15 +134,15 @@ bidirectional_lstm=layers.Bidirectional(
 output=layers.TimeDistributed(
     layers.Dense(num_tags,activation="softmax"))(bidirectional_lstm)
 model = Model(input_word, output)
-~
+```
 ## Compiling the model
-~
+```
 model.compile(optimizer="adam",
               loss="sparse_categorical_crossentropy",
               metrics=["accuracy"])
-~
+```
 ## Fitting the model
-~
+```
 history = model.fit(
     x=X_train,
     y=y_train,
@@ -150,19 +150,19 @@ history = model.fit(
     batch_size=32,
     epochs=3,
 )
-~
+```
 ## Dataframe of metrics
-~
+```
 metrics = pd.DataFrame(model.history.history)
 metrics.head()
-~
+```
 ## ploting the metrics
-~
+```
 metrics[['accuracy','val_accuracy']].plot()
 metrics[['loss','val_loss']].plot()
-~
+```
 ## Sample text prediction
-~
+```
 i = 50
 p = model.predict(np.array([X_test[i]]))
 p = np.argmax(p, axis=-1)
@@ -171,7 +171,7 @@ print("{:15}{:5}\t {}\n".format("Word", "True", "Pred"))
 print("-" *30)
 for w, true, pred in zip(X_test[i], y_true, p[0]):
     print("{:15}{}\t{}".format(words[w-1], tags[true], tags[pred]))
-~
+```
 ## OUTPUT
 
 ### Training Loss, Validation Loss Vs Iteration Plot
